@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  code       String
+  totalPrice Int      @map("total_price")
+  startTime  DateTime @map("start_time")
+  endTime    DateTime @map("end_time")
+  status     Int
+
+  // FKs  
+  driverId       Int @map("driver_id")
+  supportStaffId Int @map("support_staff_id")
+  customerId     Int @map("customer_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map(name: "orders")
+}
+
+model OrderDetail {
+  id              Int     @id @default(autoincrement())
+  description     String
+  pickupLongitude Decimal @map("pickup_longitude")
+  pickupLatitude  Decimal @map("pickup_latitude")
+  returnLongitude Decimal @map("return_longitude")
+  returnLatitude  Decimal @map("return_latitude")
+  voucherCode     String  @map("voucher_code")
+  pickupLocation  String  @map("pickup_location")
+  returnLocation  String  @map("return_location")
+  vehicleType     Int     @map("vehicle_type")
+
+  // FKs  
+  orderId Int @map("order_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map(name: "order_details")
+}
