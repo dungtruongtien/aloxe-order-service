@@ -1,37 +1,4 @@
-export interface User {
-  id: number
-  fullName: string
-  phoneNumber: string
-  email: string
-  address: string
-  dob: Date
-  role: number
-  status: number
-  createdAt: Date
-  updatedAt: Date
-  staff?: Staff
-  driver?: Driver
-  customer?: Customer
-}
-
-export interface Staff {
-  id: number
-  title: string
-  staff_id: string
-  user_id: number
-  created_at: Date
-  updated_at: Date
-}
-
-export interface Customer {
-  id: number
-  level: string
-  customer_id: string
-  user_id: number
-  user: User
-  created_at: Date
-  updated_at: Date
-}
+import { type User } from '../user/user.schema'
 
 export interface Driver {
   id: number

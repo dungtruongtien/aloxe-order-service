@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { type IGetUsersFilter, type IUserRepo } from './interface'
-import { type User } from './schema/user'
-import { INTERNAL_TOKEN } from '../common/constant'
+import { INTERNAL_TOKEN } from '../../common/constant'
+import { type User } from './user.schema'
+import { type IGetUsersFilter, type IUserRepo } from './user.interface'
 
 export class UserRepository implements IUserRepo {
   async getUsers (filter?: IGetUsersFilter): Promise<User[]> {

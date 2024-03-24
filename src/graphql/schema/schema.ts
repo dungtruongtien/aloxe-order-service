@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server-express'
-import userAccountGraphql from './account'
+import userAccountGraphql from './order'
 import { mergeRawSchemas } from '../../helpers/mergeRawSchemas'
 import { type DocumentNode } from 'graphql'
 

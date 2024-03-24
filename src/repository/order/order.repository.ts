@@ -1,5 +1,5 @@
-import { type IGetListOrderFilter, type IOrderRepo } from './interface'
-import prisma from '../client/prisma'
+import { type IGetListOrderFilter, type IOrderRepo } from './order.interface'
+import prisma from '../../client/prisma'
 import { type Prisma, type Order } from '@prisma/client'
 
 export class OrderRepository implements IOrderRepo {
