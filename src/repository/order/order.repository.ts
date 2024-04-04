@@ -37,4 +37,12 @@ export class OrderRepository implements IOrderRepo {
       orderBy: sort
     })
   }
+
+  async createOrder (input: Prisma.OrderCreateInput): Promise<Order> {
+    return await prisma.order.create({ data: input })
+  }
+
+  async updateOrder (id: number, input: Prisma.OrderUpdateInput): Promise<Order> {
+    return await prisma.order.update({ data: input, where: { id } })
+  }
 }

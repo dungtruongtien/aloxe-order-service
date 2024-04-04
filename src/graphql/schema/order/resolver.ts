@@ -1,7 +1,7 @@
-import OrderController from '../../../controller/order/order.controller'
+import OrderGraphController from '../../../controller/order/order.controller.graph'
 import { type IContext } from '../../context'
 
-const orderController = new OrderController()
+const orderController = new OrderGraphController()
 
 export default {
   Query: {

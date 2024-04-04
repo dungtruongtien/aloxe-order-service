@@ -16,12 +16,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.restAuthenticate = exports.graphqlAuthenticate = void 0;
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var constant_1 = require("../common/constant");
 var WHITE_LIST_APIS = ['/api/user/v1/register', '/api/auth/v1/login', '/api/auth/v1/token/access', '/api/auth/v1/logout'];
 var WHITE_LIST_GRAPHQL_OPERATIONS = ['Login'];
 var GRAPHQL_PATH = '/graphql';
 var graphqlAuthenticate = function (req, res, next) {
     var _a;
-    res.locals.user = { test: 'abc' };
     var operationName = req.body.operationName;
     if (!operationName) {
         throw new Error('Authentication failed');
@@ -35,7 +35,7 @@ var graphqlAuthenticate = function (req, res, next) {
     if (!token) {
         throw new Error('Authentication failed');
     }
-    jsonwebtoken_1.default.verify(token, 'AUTH_ACCESS_SERCRET_KEY', function (err, decoded) {
+    jsonwebtoken_1.default.verify(token, constant_1.AUTH_ACCESS_SERCRET_KEY, function (err, decoded) {
         if (err) {
             if (err.name === 'TokenExpiredError') {
                 throw new Error('TokenExpiredError');
@@ -57,7 +57,7 @@ var restAuthenticate = function (req, res, next) {
     if (!token) {
         throw new Error('Authentication failed');
     }
-    jsonwebtoken_1.default.verify(token, 'AUTH_ACCESS_SERCRET_KEY', function (err, decoded) {
+    jsonwebtoken_1.default.verify(token, constant_1.AUTH_ACCESS_SERCRET_KEY, function (err, decoded) {
         if (err) {
             if (err.name === 'TokenExpiredError') {
                 throw new Error('TokenExpiredError');

@@ -15,13 +15,15 @@ model Order {
   code       String
   totalPrice Int      @map("total_price")
   startTime  DateTime @map("start_time")
-  endTime    DateTime @map("end_time")
+  endTime    DateTime? @map("end_time")
   status     Int
 
   // FKs  
-  driverId       Int @map("driver_id")
-  supportStaffId Int @map("support_staff_id")
+  driverId       Int? @map("driver_id")
+  supportStaffId Int? @map("support_staff_id")
   customerId     Int @map("customer_id")
+
+  orderDetail OrderDetail?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -36,13 +38,15 @@ model OrderDetail {
   pickupLatitude  Decimal @map("pickup_latitude")
   returnLongitude Decimal @map("return_longitude")
   returnLatitude  Decimal @map("return_latitude")
-  voucherCode     String  @map("voucher_code")
+  voucherCode     String?  @map("voucher_code")
   pickupLocation  String  @map("pickup_location")
   returnLocation  String  @map("return_location")
   vehicleType     Int     @map("vehicle_type")
 
   // FKs  
-  orderId Int @map("order_id")
+  orderId Int @map("order_id") @unique
+
+  order   Order @relation(fields: [orderId], references: [id], map: "fk_order_order_detail")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")

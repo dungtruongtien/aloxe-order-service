@@ -1,5 +1,6 @@
 import express from 'express'
 import http from 'http'
+import { type GraphQLFormattedError } from 'graphql'
 import { ApolloServer } from '@apollo/server'
 import { expressMiddleware } from '@apollo/server/express4'
 import { buildSubgraphSchema } from '@apollo/subgraph'
@@ -7,7 +8,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import cors from 'cors'
 import schema from './graphql/schema/schema'
 import initCtx from './graphql/context'
-import { type GraphQLFormattedError } from 'graphql'
+import apiRouteHandler from './routes/api.route'
 import { restAuthenticate, graphqlAuthenticate } from './middlewares/auth.middleware'
 
 interface MyContext {
@@ -37,8 +38,10 @@ async function start () {
   app.use(express.json())
   // app.use(bodyParser.graphql())
   app.use(express.urlencoded({ extended: true }))
-  app.use(graphqlAuthenticate)
-  app.use(restAuthenticate)
+  // app.use(graphqlAuthenticate)
+  // app.use(restAuthenticate)
+
+  app.use('/api', apiRouteHandler)
 
   app.use(
     '/graphql',

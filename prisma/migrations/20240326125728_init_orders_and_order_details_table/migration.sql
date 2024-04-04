@@ -4,9 +4,10 @@ CREATE TABLE `orders` (
     `code` VARCHAR(191) NOT NULL,
     `total_price` INTEGER NOT NULL,
     `start_time` DATETIME(3) NOT NULL,
-    `end_time` DATETIME(3) NOT NULL,
-    `driver_id` INTEGER NOT NULL,
-    `support_staff_id` INTEGER NOT NULL,
+    `end_time` DATETIME(3) NULL,
+    `status` INTEGER NOT NULL,
+    `driver_id` INTEGER NULL,
+    `support_staff_id` INTEGER NULL,
     `customer_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -22,7 +23,7 @@ CREATE TABLE `order_details` (
     `pickup_latitude` DECIMAL(65, 30) NOT NULL,
     `return_longitude` DECIMAL(65, 30) NOT NULL,
     `return_latitude` DECIMAL(65, 30) NOT NULL,
-    `voucher_code` VARCHAR(191) NOT NULL,
+    `voucher_code` VARCHAR(191) NULL,
     `pickup_location` VARCHAR(191) NOT NULL,
     `return_location` VARCHAR(191) NOT NULL,
     `vehicle_type` INTEGER NOT NULL,
@@ -30,5 +31,9 @@ CREATE TABLE `order_details` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `order_details_order_id_key`(`order_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `order_details` ADD CONSTRAINT `fk_order_order_detail` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

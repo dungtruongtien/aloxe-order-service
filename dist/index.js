@@ -48,7 +48,7 @@ var drainHttpServer_1 = require("@apollo/server/plugin/drainHttpServer");
 var cors_1 = __importDefault(require("cors"));
 var schema_1 = __importDefault(require("./graphql/schema/schema"));
 var context_1 = __importDefault(require("./graphql/context"));
-var auth_middleware_1 = require("./middlewares/auth.middleware");
+var api_route_1 = __importDefault(require("./routes/api.route"));
 function start() {
     return __awaiter(this, void 0, void 0, function () {
         var app, httpServer, server;
@@ -72,8 +72,7 @@ function start() {
                     _a.sent();
                     app.use(express_1.default.json());
                     app.use(express_1.default.urlencoded({ extended: true }));
-                    app.use(auth_middleware_1.graphqlAuthenticate);
-                    app.use(auth_middleware_1.restAuthenticate);
+                    app.use('/api', api_route_1.default);
                     app.use('/graphql', (0, cors_1.default)(), (0, express4_1.expressMiddleware)(server, {
                         context: context_1.default
                     }));
