@@ -32,3 +32,12 @@ export interface Vehicle {
   created_at: Date
   updated_at: Date
 }
+
+export interface DriverOnlineSession {
+  currentLongitude: string
+  currentLatitude: string
+  onlineStatus: number
+  workingStatus: number
+  createdAt: string
+  updatedAt: string
+}

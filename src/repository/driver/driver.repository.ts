@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { INTERNAL_TOKEN } from '../../common/constant'
-import { type IGetDriversFilter, type IDriverRepo } from './driver.interface'
-import { type Driver } from './driver.schema'
+import { type IGetDriversFilter, type IDriverRepo, type DriverOnlineSessionUpdateInput } from './driver.interface'
+import { type DriverOnlineSession, type Driver } from './driver.schema'
 
 export class DriverRepository implements IDriverRepo {
   async getDrivers (filter?: IGetDriversFilter): Promise<Driver[]> {
@@ -23,5 +23,20 @@ export class DriverRepository implements IDriverRepo {
 
     const response = await axios.request(config)
     return response.data.data as Driver[]
+  }
+
+  async updateDriverOnlineSession (input: DriverOnlineSessionUpdateInput): Promise<DriverOnlineSession> {
+    const config = {
+      method: 'put',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:4003/api/drivers/online-session',
+      headers: {
+        authorization: INTERNAL_TOKEN
+      },
+      data: input
+    }
+
+    const response = await axios.request(config)
+    return response.data.data as DriverOnlineSession
   }
 }

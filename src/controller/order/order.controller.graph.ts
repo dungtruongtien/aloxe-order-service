@@ -5,6 +5,7 @@ import { OrderRepository } from '../../repository/order/order.repository'
 import { StaffRepository } from '../../repository/staff/staff.repository'
 import { UserRepository } from '../../repository/user/user.repository'
 import { BookingService } from '../../services/booking/booking.service'
+import NotificationService from '../../services/notification/notification.service'
 import { type IOrderService } from '../../services/order/order.interface'
 import { OrderService } from '../../services/order/order.service'
 import { type IResponse } from '../interface'
@@ -18,8 +19,9 @@ export default class OrderGraphController implements IOrderGraphController {
   private readonly driverRepository = new DriverRepository()
   private readonly staffRepository = new StaffRepository()
   private readonly bookingService = new BookingService()
+  private readonly notificationService = new NotificationService()
   constructor () {
-    this.orderService = new OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService)
+    this.orderService = new OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService, this.notificationService)
   }
 
   async getListOrders (filter: IGetListOrderFilter | null): Promise<IResponse> {

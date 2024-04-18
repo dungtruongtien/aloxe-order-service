@@ -1,9 +1,11 @@
-import express from 'express'
+import express, { type Router } from 'express'
+import { createOrderRoute } from './order.route'
 
-import orderRouterHandler from './order.route'
+export const createRootRoute = (): Router => {
+  const router = express.Router()
+  const orderRoute = createOrderRoute()
 
-const router = express.Router()
+  router.use('/orders', orderRoute)
 
-router.use('/orders', orderRouterHandler)
-
-export default router
+  return router
+}

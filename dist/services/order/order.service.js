@@ -48,8 +48,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderService = void 0;
+var order_interface_1 = require("../../repository/order/order.interface");
 var distance_1 = require("../../utils/distance");
-var date_fns_tz_1 = require("date-fns-tz");
 var VEHICLE_TYPE_MAPPING = {
     FOUR_SEAT: 1,
     FIVE_SEAT: 2,
@@ -57,7 +57,7 @@ var VEHICLE_TYPE_MAPPING = {
     VIP: 4
 };
 var OrderService = (function () {
-    function OrderService(orderRepo, userRepo, staffRepo, driverRepo, customerRepo, bookingService) {
+    function OrderService(orderRepo, userRepo, staffRepo, driverRepo, customerRepo, bookingService, notificationService) {
         var _this = this;
         this.getListOrders = function (filter) { return __awaiter(_this, void 0, void 0, function () {
             var rs, customerId, limit, offset, userFilter, listUsers, orders, staffIds, staffs, customerIds, customers, driverIds, drivers, ordersRes;
@@ -110,7 +110,7 @@ var OrderService = (function () {
             });
         }); };
         this.createOrder = function (input) { return __awaiter(_this, void 0, void 0, function () {
-            var customer, user, userInfo, resp, orderDetail, pickPosition, returnPosition, distance, totalPrice, orderCreateDto, orderCreatedRes, nowInVN, startTimeInVN, processBookingOrderDTO;
+            var customer, user, userInfo, resp, orderDetail, pickPosition, returnPosition, distance, totalPrice, orderCreateDto, orderCreatedRes, processBookingOrderDTO;
             var _a, _b, _c, _d, _e, _f;
             return __generator(this, function (_g) {
                 switch (_g.label) {
@@ -143,7 +143,7 @@ var OrderService = (function () {
                             supportStaffId: ((_c = input === null || input === void 0 ? void 0 : input.staff) === null || _c === void 0 ? void 0 : _c.id) || 0,
                             code: "BOOK_".concat(new Date().getTime()),
                             status: 1,
-                            startTime: new Date(input.startTime).toISOString(),
+                            startTime: new Date(input.startTime),
                             endTime: input.endTime,
                             totalPrice: totalPrice,
                             orderDetail: {
@@ -163,9 +163,6 @@ var OrderService = (function () {
                         return [4, this.orderRepo.createOrder(orderCreateDto)];
                     case 3:
                         orderCreatedRes = _g.sent();
-                        nowInVN = (0, date_fns_tz_1.zonedTimeToUtc)(new Date(), 'Asia/Ho_Chi_Minh');
-                        startTimeInVN = (0, date_fns_tz_1.zonedTimeToUtc)(new Date(input.startTime), 'Asia/Ho_Chi_Minh');
-                        if (!(startTimeInVN.getTime() <= nowInVN.getTime())) return [3, 5];
                         console.log('TODO here', orderCreatedRes);
                         processBookingOrderDTO = {
                             id: orderCreatedRes.id,
@@ -173,7 +170,7 @@ var OrderService = (function () {
                             supportStaffId: ((_f = input === null || input === void 0 ? void 0 : input.staff) === null || _f === void 0 ? void 0 : _f.id) || 0,
                             code: "BOOK_".concat(new Date().getTime()),
                             status: 1,
-                            startTime: new Date(input.startTime).toISOString(),
+                            startTime: input.startTime,
                             endTime: input.endTime,
                             totalPrice: totalPrice,
                             orderDetail: {
@@ -191,8 +188,7 @@ var OrderService = (function () {
                         return [4, this.bookingService.processBookingOrder(processBookingOrderDTO)];
                     case 4:
                         _g.sent();
-                        _g.label = 5;
-                    case 5: return [2, null];
+                        return [2, null];
                 }
             });
         }); };
@@ -250,12 +246,97 @@ var OrderService = (function () {
                 }
             });
         }); };
+        this.orderDriverAction = function (driverId, orderId, actionType, assignedDriverId) { return __awaiter(_this, void 0, void 0, function () {
+            var bookingResp, _a, input, input, input;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        bookingResp = null;
+                        _a = actionType;
+                        switch (_a) {
+                            case 'CONFIRMED': return [3, 1];
+                            case 'CANCELLED': return [3, 3];
+                            case 'USER_CANCELLED': return [3, 6];
+                            case 'ARRIVED': return [3, 10];
+                            case 'PAID': return [3, 12];
+                            case 'ONBOARDING': return [3, 16];
+                            case 'DRIVER_COME': return [3, 18];
+                        }
+                        return [3, 20];
+                    case 1: return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.DRIVER_CONFIRMED })];
+                    case 2:
+                        bookingResp = _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_CONFIRMED' }) });
+                        return [2, bookingResp];
+                    case 3: return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.CANCELLED })];
+                    case 4:
+                        bookingResp = _b.sent();
+                        input = {
+                            id: driverId,
+                            workingStatus: 1
+                        };
+                        return [4, this.driverRepo.updateDriverOnlineSession(input)];
+                    case 5:
+                        _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'CANCELLED', message: 'Driver is cancelled your booking, please retry to book a new car.' }) });
+                        return [2, bookingResp];
+                    case 6:
+                        console.log('assignedDriverId---', assignedDriverId);
+                        return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.CANCELLED })];
+                    case 7:
+                        bookingResp = _b.sent();
+                        if (!assignedDriverId) return [3, 9];
+                        input = {
+                            id: driverId,
+                            workingStatus: 1
+                        };
+                        return [4, this.driverRepo.updateDriverOnlineSession(input)];
+                    case 8:
+                        _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'USER_CANCELLED', message: 'Customer cancelled your booking.' }) });
+                        _b.label = 9;
+                    case 9: return [2, bookingResp];
+                    case 10: return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.ARRIVED })];
+                    case 11:
+                        bookingResp = _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ARRIVED' }) });
+                        return [2, bookingResp];
+                    case 12: return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.PAID })];
+                    case 13:
+                        bookingResp = _b.sent();
+                        if (!driverId) return [3, 15];
+                        input = {
+                            id: driverId,
+                            workingStatus: 2
+                        };
+                        return [4, this.driverRepo.updateDriverOnlineSession(input)];
+                    case 14:
+                        _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'PAID' }) });
+                        _b.label = 15;
+                    case 15: return [2, bookingResp];
+                    case 16: return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.ONBOARDING })];
+                    case 17:
+                        bookingResp = _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ONBOARDING' }) });
+                        return [2, bookingResp];
+                    case 18: return [4, this.orderRepo.updateOrder(orderId, { status: order_interface_1.OrderStatus.DRIVER_COME })];
+                    case 19:
+                        bookingResp = _b.sent();
+                        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_COME' }) });
+                        return [2, bookingResp];
+                    case 20: return [3, 21];
+                    case 21: return [2, null];
+                }
+            });
+        }); };
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.staffRepo = staffRepo;
         this.driverRepo = driverRepo;
         this.customerRepo = customerRepo;
         this.bookingService = bookingService;
+        this.notificationService = notificationService;
     }
     return OrderService;
 }());

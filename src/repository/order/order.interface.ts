@@ -1,12 +1,15 @@
 import { type Prisma, type Order } from '@prisma/client'
 
-enum OrderStatus {
+export enum OrderStatus {
   DRIVER_CONFIRMED = 1,
   CANCELLED = 2,
   ARRIVED = 3,
   PAID = 4,
   ONBOARDING = 5,
   BOOKED = 6,
+  DRIVER_NOT_FOUND = 7,
+  DRIVER_FOUND = 8,
+  DRIVER_COME = 9
 }
 
 export interface IGetListOrderFilter {

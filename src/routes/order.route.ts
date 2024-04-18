@@ -1,14 +1,14 @@
-/* eslint "@typescript-eslint/no-misused-promises": 0 */ // --> OFF
-/* eslint @typescript-eslint/unbound-method: 0 */ // --> OFF
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */ // --> OFF
-
-import express from 'express'
+import express, { type Router } from 'express'
 import OrderRestController from '../controller/order/order.controller.rest'
-const router = express.Router()
 
-const orderController = new OrderRestController()
+export const createOrderRoute = (): Router => {
+  const router = express.Router()
 
-router.put('/', orderController.updateOrder.bind(orderController))
-router.post('/', orderController.createOrder.bind(orderController))
+  const orderController = new OrderRestController()
 
-export default router
+  router.put('/', orderController.updateOrder.bind(orderController))
+  router.post('/', orderController.createOrder.bind(orderController))
+  router.post('/driver-action', orderController.orderDriverAction.bind(orderController))
+  return router
+}

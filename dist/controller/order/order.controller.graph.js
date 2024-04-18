@@ -35,6 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var customer_repository_1 = require("../../repository/customer/customer.repository");
 var driver_repository_1 = require("../../repository/driver/driver.repository");
@@ -42,6 +45,7 @@ var order_repository_1 = require("../../repository/order/order.repository");
 var staff_repository_1 = require("../../repository/staff/staff.repository");
 var user_repository_1 = require("../../repository/user/user.repository");
 var booking_service_1 = require("../../services/booking/booking.service");
+var notification_service_1 = __importDefault(require("../../services/notification/notification.service"));
 var order_service_1 = require("../../services/order/order.service");
 var OrderGraphController = (function () {
     function OrderGraphController() {
@@ -51,7 +55,8 @@ var OrderGraphController = (function () {
         this.driverRepository = new driver_repository_1.DriverRepository();
         this.staffRepository = new staff_repository_1.StaffRepository();
         this.bookingService = new booking_service_1.BookingService();
-        this.orderService = new order_service_1.OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService);
+        this.notificationService = new notification_service_1.default();
+        this.orderService = new order_service_1.OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService, this.notificationService);
     }
     OrderGraphController.prototype.getListOrders = function (filter) {
         return __awaiter(this, void 0, void 0, function () {

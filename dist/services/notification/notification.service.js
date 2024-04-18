@@ -39,51 +39,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DriverRepository = void 0;
 var axios_1 = __importDefault(require("axios"));
 var constant_1 = require("../../common/constant");
-var DriverRepository = (function () {
-    function DriverRepository() {
-    }
-    DriverRepository.prototype.getDrivers = function (filter) {
-        return __awaiter(this, void 0, void 0, function () {
-            var queryFilter, config, response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        queryFilter = '';
-                        if ((filter === null || filter === void 0 ? void 0 : filter.driverIds) && filter.driverIds.length > 0) {
-                            queryFilter = filter.driverIds.reduce(function (total, driverId, idx) {
-                                total += "id=".concat(driverId).concat(idx < filter.driverIds.length - 1 && '&');
-                                return total;
-                            }, '');
-                        }
-                        config = {
-                            method: 'get',
-                            maxBodyLength: Infinity,
-                            url: "http://localhost:4003/api/drivers?".concat(queryFilter),
-                            headers: {
-                                authorization: constant_1.INTERNAL_TOKEN
-                            }
-                        };
-                        return [4, axios_1.default.request(config)];
-                    case 1:
-                        response = _a.sent();
-                        return [2, response.data.data];
-                }
-            });
-        });
-    };
-    DriverRepository.prototype.updateDriverOnlineSession = function (input) {
-        return __awaiter(this, void 0, void 0, function () {
-            var config, response;
+var NotificationService = (function () {
+    function NotificationService() {
+        var _this = this;
+        this.broadcast = function (input) { return __awaiter(_this, void 0, void 0, function () {
+            var config;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         config = {
-                            method: 'put',
+                            method: 'post',
                             maxBodyLength: Infinity,
-                            url: 'http://localhost:4003/api/drivers/online-session',
+                            url: 'http://localhost:4005/api/notification/',
                             headers: {
                                 authorization: constant_1.INTERNAL_TOKEN
                             },
@@ -91,13 +60,13 @@ var DriverRepository = (function () {
                         };
                         return [4, axios_1.default.request(config)];
                     case 1:
-                        response = _a.sent();
-                        return [2, response.data.data];
+                        _a.sent();
+                        return [2, true];
                 }
             });
-        });
-    };
-    return DriverRepository;
+        }); };
+    }
+    return NotificationService;
 }());
-exports.DriverRepository = DriverRepository;
-//# sourceMappingURL=driver.repository.js.map
+exports.default = NotificationService;
+//# sourceMappingURL=notification.service.js.map

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OrderStatus = void 0;
 var OrderStatus;
 (function (OrderStatus) {
     OrderStatus[OrderStatus["DRIVER_CONFIRMED"] = 1] = "DRIVER_CONFIRMED";
@@ -8,5 +9,8 @@ var OrderStatus;
     OrderStatus[OrderStatus["PAID"] = 4] = "PAID";
     OrderStatus[OrderStatus["ONBOARDING"] = 5] = "ONBOARDING";
     OrderStatus[OrderStatus["BOOKED"] = 6] = "BOOKED";
-})(OrderStatus || (OrderStatus = {}));
+    OrderStatus[OrderStatus["DRIVER_NOT_FOUND"] = 7] = "DRIVER_NOT_FOUND";
+    OrderStatus[OrderStatus["DRIVER_FOUND"] = 8] = "DRIVER_FOUND";
+    OrderStatus[OrderStatus["DRIVER_COME"] = 9] = "DRIVER_COME";
+})(OrderStatus || (exports.OrderStatus = OrderStatus = {}));
 //# sourceMappingURL=order.interface.js.map

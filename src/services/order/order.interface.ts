@@ -40,4 +40,5 @@ export interface IOrderService {
   getListOrders: (filter: IGetListOrderFilter | null) => Promise<Order[]>
   createOrder: (input: ICreateOrderInput) => Promise<any>
   updateOrder: (input: IUpdateOrderInput) => Promise<any>
+  orderDriverAction: (driverId: number, orderId: number, actionType: string, assignedDriverId: number) => Promise<Order | null>
 }

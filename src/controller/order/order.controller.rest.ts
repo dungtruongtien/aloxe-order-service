@@ -10,6 +10,7 @@ import { OrderService } from '../../services/order/order.service'
 import { type IOrderRestController } from './interface'
 import { HttpStatusCode } from 'axios'
 import { BookingService } from '../../services/booking/booking.service'
+import NotificationService from '../../services/notification/notification.service'
 
 export default class OrderRestController implements IOrderRestController {
   private readonly orderService: IOrderService
@@ -19,8 +20,9 @@ export default class OrderRestController implements IOrderRestController {
   private readonly driverRepository = new DriverRepository()
   private readonly staffRepository = new StaffRepository()
   private readonly bookingService = new BookingService()
+  private readonly notificationService = new NotificationService()
   constructor () {
-    this.orderService = new OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService)
+    this.orderService = new OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService, this.notificationService)
   }
 
   async getListOrders (req: Request, res: Response, next: NextFunction): Promise<any> {
@@ -42,6 +44,15 @@ export default class OrderRestController implements IOrderRestController {
 
   async createOrder (req: Request, res: Response, next: NextFunction): Promise<any> {
     const data = await this.orderService.createOrder(req.body as ICreateOrderInput)
+    res.status(HttpStatusCode.Ok).json({
+      status: 'SUCCESS',
+      data
+    })
+  }
+
+  orderDriverAction = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const { driverId, orderId, actionType, assignedDriverId } = req.body
+    const data = await this.orderService.orderDriverAction(driverId as number, orderId as number, actionType as string, assignedDriverId as number)
     res.status(HttpStatusCode.Ok).json({
       status: 'SUCCESS',
       data

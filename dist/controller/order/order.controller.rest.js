@@ -35,6 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var customer_repository_1 = require("../../repository/customer/customer.repository");
 var driver_repository_1 = require("../../repository/driver/driver.repository");
@@ -44,15 +47,35 @@ var user_repository_1 = require("../../repository/user/user.repository");
 var order_service_1 = require("../../services/order/order.service");
 var axios_1 = require("axios");
 var booking_service_1 = require("../../services/booking/booking.service");
+var notification_service_1 = __importDefault(require("../../services/notification/notification.service"));
 var OrderRestController = (function () {
     function OrderRestController() {
+        var _this = this;
         this.orderRepository = new order_repository_1.OrderRepository();
         this.userRepository = new user_repository_1.UserRepository();
         this.customerRepository = new customer_repository_1.CustomerRepository();
         this.driverRepository = new driver_repository_1.DriverRepository();
         this.staffRepository = new staff_repository_1.StaffRepository();
         this.bookingService = new booking_service_1.BookingService();
-        this.orderService = new order_service_1.OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService);
+        this.notificationService = new notification_service_1.default();
+        this.orderDriverAction = function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
+            var _a, driverId, orderId, actionType, assignedDriverId, data;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = req.body, driverId = _a.driverId, orderId = _a.orderId, actionType = _a.actionType, assignedDriverId = _a.assignedDriverId;
+                        return [4, this.orderService.orderDriverAction(driverId, orderId, actionType, assignedDriverId)];
+                    case 1:
+                        data = _b.sent();
+                        res.status(axios_1.HttpStatusCode.Ok).json({
+                            status: 'SUCCESS',
+                            data: data
+                        });
+                        return [2];
+                }
+            });
+        }); };
+        this.orderService = new order_service_1.OrderService(this.orderRepository, this.userRepository, this.staffRepository, this.driverRepository, this.customerRepository, this.bookingService, this.notificationService);
     }
     OrderRestController.prototype.getListOrders = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
