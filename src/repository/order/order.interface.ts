@@ -23,6 +23,7 @@ export interface IGetListOrderFilter {
 
 export interface IOrderRepo {
   getListOrder: (filter: IGetListOrderFilter | null, limit: number, page: number, sort: Prisma.OrderOrderByWithRelationInput) => Promise<Order[]>
+  getOrder: (id: number) => Promise<Order | null>
   createOrder: (input: Prisma.OrderCreateInput) => Promise<Order>
   updateOrder: (id: number, input: Prisma.OrderUpdateInput) => Promise<Order>
 }

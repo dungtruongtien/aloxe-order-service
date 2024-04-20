@@ -70,15 +70,42 @@ export class OrderService implements IOrderService {
 
     const ordersRes: IOrderEntity[] = []
     orders.forEach((order) => {
+      const staff = staffs.find(staff => staff.id === order.supportStaffId)
+      const driver = drivers.find(driver => driver.id === order.driverId)
+      const customer = customers.find(customer => customer.id === order.customerId)
       const orderRes: IOrderEntity = {
         ...order,
-        staff: staffs[0] ?? {},
-        driver: drivers[0] ?? {},
-        customer: customers[0] ?? {}
+        staff,
+        driver,
+        customer
       }
       ordersRes.push(orderRes)
     })
     return ordersRes
+  }
+
+  getOrder = async (id: number): Promise<IOrderEntity | null> => {
+    const order = await this.orderRepo.getOrder(id)
+    if (!order) {
+      return null
+    }
+    // Get staff, customer, driver info to fill in order data
+    const orderRes: IOrderEntity = {
+      ...order
+    }
+    if (order.supportStaffId) {
+      const staffs = await this.staffRepo.getStaffs({ staffIds: [order.supportStaffId] })
+      orderRes.staff = staffs[0] ?? {}
+    }
+
+    const customers = await this.customerRepo.getCustomers({ customerIds: [order.customerId] })
+    orderRes.customer = customers[0] ?? {}
+
+    if (order.driverId) {
+      const drivers = await this.driverRepo.getDrivers({ driverIds: [order.driverId] })
+      orderRes.driver = drivers[0] ?? {}
+    }
+    return orderRes
   }
 
   createOrder = async (input: ICreateOrderInput): Promise<any> => {

@@ -1,6 +1,7 @@
 import { type Order } from '@prisma/client'
 import { type IGetListOrderFilter } from '../../repository/order/order.interface'
 import { type Staff } from '../../repository/staff/staff.schema'
+import { type IOrderEntity } from '../../repository/order/order.schema'
 
 export interface ICreateOrderCustomerInput {
   phoneNumber: string
@@ -37,7 +38,8 @@ export interface IUpdateOrderInput {
 }
 
 export interface IOrderService {
-  getListOrders: (filter: IGetListOrderFilter | null) => Promise<Order[]>
+  getListOrders: (filter: IGetListOrderFilter | null) => Promise<IOrderEntity[]>
+  getOrder: (id: number) => Promise<IOrderEntity | null>
   createOrder: (input: ICreateOrderInput) => Promise<any>
   updateOrder: (input: IUpdateOrderInput) => Promise<any>
   orderDriverAction: (driverId: number, orderId: number, actionType: string, assignedDriverId: number) => Promise<Order | null>

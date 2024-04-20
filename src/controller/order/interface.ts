@@ -8,6 +8,7 @@ export interface IOrderGraphController {
 export interface IOrderRestController {
   getListOrders: (req: Request, res: Response, next: NextFunction) => Promise<any>
   createOrder: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  getOrder: (req: Request, res: Response, next: NextFunction) => Promise<any>
 }
 
 export interface IResponse {

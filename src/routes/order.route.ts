@@ -7,6 +7,7 @@ export const createOrderRoute = (): Router => {
 
   const orderController = new OrderRestController()
 
+  router.get('/', orderController.getListOrders.bind(orderController))
   router.put('/', orderController.updateOrder.bind(orderController))
   router.post('/', orderController.createOrder.bind(orderController))
   router.post('/driver-action', orderController.orderDriverAction.bind(orderController))
