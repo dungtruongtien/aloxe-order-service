@@ -9,7 +9,7 @@ import NotificationService from '../../services/notification/notification.servic
 import { type IOrderService } from '../../services/order/order.interface'
 import { OrderService } from '../../services/order/order.service'
 import { type IResponse } from '../interface'
-import { type IOrderGraphController } from './interface'
+import { type IOrderGraphController } from './order.interface'
 
 export default class OrderGraphController implements IOrderGraphController {
   private readonly orderService: IOrderService

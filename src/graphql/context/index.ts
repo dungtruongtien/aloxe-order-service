@@ -21,7 +21,6 @@ export interface IContext {
 }
 
 export default async function initCtx ({ req, res }: ICtxInput): Promise<IContext> {
-  // TODO remove this any
   const context: IContext = {
     prisma,
     account: res.locals.account

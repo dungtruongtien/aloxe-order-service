@@ -3,6 +3,13 @@ import { type IGetListOrderFilter } from '../../repository/order/order.interface
 import { type Staff } from '../../repository/staff/staff.schema'
 import { type IOrderEntity } from '../../repository/order/order.schema'
 
+export type VEHICLE_TYPE = 'FOUR_SEAT' | 'FIVE_SEAT' | 'SEVEN_SEAT' | 'VIP'
+export const VEHICLE_TYPE_MAPPING: Record<VEHICLE_TYPE, number> = {
+  FOUR_SEAT: 1,
+  FIVE_SEAT: 2,
+  SEVEN_SEAT: 3,
+  VIP: 4
+}
 export interface ICreateOrderCustomerInput {
   phoneNumber: string
   userId: number
@@ -19,7 +26,7 @@ export interface ICreateOrderInput {
   endTime: string
   totalPrice: number
   orderDetail: {
-    vehicleType: string
+    vehicleType: VEHICLE_TYPE
     pickupLongitude: number
     pickupLatitude: number
     returnLongitude: number

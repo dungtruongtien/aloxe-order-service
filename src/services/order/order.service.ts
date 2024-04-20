@@ -5,19 +5,13 @@ import { type IOrderEntity } from '../../repository/order/order.schema'
 import { type IStaffRepo } from '../../repository/staff/staff.interface'
 import { type ICreateCustomerUserInput, type IGetUsersFilter, type IUserRepo } from '../../repository/user/user.interface'
 import { type Prisma, type Order } from '@prisma/client'
-import { type IUpdateOrderInput, type ICreateOrderInput, type IOrderService, type ICreateOrderCustomerInput } from './order.interface'
+import { type IUpdateOrderInput, type ICreateOrderInput, type IOrderService, type ICreateOrderCustomerInput, VEHICLE_TYPE_MAPPING } from './order.interface'
 import { type User } from '../../repository/user/user.schema'
 import { getDistanceFromLatLonInKm } from '../../utils/distance'
 import { type IBookingService } from '../booking/booking.interface'
 import { type IProcessBookingOrderDTO } from './order.dto'
 import { type INotificationService } from '../notification/notification.interface'
-
-const VEHICLE_TYPE_MAPPING: any = {
-  FOUR_SEAT: 1,
-  FIVE_SEAT: 2,
-  SEVEN_SEAT: 3,
-  VIP: 4
-}
+import { PRICE_PER_KM } from '../../common/constant'
 
 export class OrderService implements IOrderService {
   private readonly orderRepo: IOrderRepo
@@ -131,10 +125,9 @@ export class OrderService implements IOrderService {
     }
 
     const distance = getDistanceFromLatLonInKm(pickPosition, returnPosition)
-    const totalPrice = distance * 10000 // 10000 each km
+    const totalPrice = distance * PRICE_PER_KM
     resp.totalPrice = totalPrice
 
-    console.log('bookingInput-----', input)
     const orderCreateDto: Prisma.OrderCreateInput = {
       customerId: user?.customer?.id ?? 0,
       supportStaffId: input?.staff?.id || 0,
@@ -158,8 +151,6 @@ export class OrderService implements IOrderService {
       }
     }
     const orderCreatedRes = await this.orderRepo.createOrder(orderCreateDto)
-    // TODO  Push message to queue immediately
-    console.log('TODO here', orderCreatedRes)
     const processBookingOrderDTO: IProcessBookingOrderDTO = {
       id: orderCreatedRes.id,
       customerId: user?.customer?.id ?? 0,
@@ -192,7 +183,6 @@ export class OrderService implements IOrderService {
       phoneNumber: [customer.phoneNumber]
     }
     const users = await this.userRepo.getUsers(userFilter)
-    console.log('users------', users)
     if (!users || users.length === 0) {
       const input: ICreateCustomerUserInput = {
         fullName: customer.fullName,
@@ -221,7 +211,6 @@ export class OrderService implements IOrderService {
       totalPrice: input.totalPrice
     }
     const data = await this.orderRepo.updateOrder(input.id, orderUpdateDto)
-    console.log('data-----', data)
     return data
   }
 
@@ -229,148 +218,52 @@ export class OrderService implements IOrderService {
     let bookingResp = null
     switch (actionType) {
       case 'CONFIRMED':
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'DRIVER_CONFIRMED'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.DRIVER_CONFIRMED })
-        // TODO call API to booking service to broadcast message
-        // broadcastPrivateMessage(bookingId, JSON.stringify({ status: 'DRIVER_CONFIRMED' }))
         this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_CONFIRMED' }) })
         return bookingResp
       case 'CANCELLED': {
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'CANCELLED'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.CANCELLED })
-        // await DriverLogginSession.update(
-        //   {
-        //     drivingStatus: 'WAITING_FOR_CUSTOMER'
-        //   },
-        //   {
-        //     where: { driverId }
-        //   }
-        // )
         const input: DriverOnlineSessionUpdateInput = {
           id: driverId,
           workingStatus: 1
         }
         await this.driverRepo.updateDriverOnlineSession(input)
-        // TODO call API to booking service to broadcast message
-        // broadcastPrivateMessage(bookingId, JSON.stringify({ status: 'CANCELLED', message: 'Driver is cancelled your booking, please retry to book a new car.' }))
         this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'CANCELLED', message: 'Driver is cancelled your booking, please retry to book a new car.' }) })
         return bookingResp
       }
       case 'USER_CANCELLED':
-        console.log('assignedDriverId---', assignedDriverId)
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'CANCELLED'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.CANCELLED })
         if (assignedDriverId) {
-          // await DriverLogginSession.update(
-          //   {
-          //     drivingStatus: 'WAITING_FOR_CUSTOMER'
-          //   },
-          //   {
-          //     where: { driverId: assignedDriverId }
-          //   }
-          // )
           const input: DriverOnlineSessionUpdateInput = {
             id: driverId,
             workingStatus: 1
           }
           await this.driverRepo.updateDriverOnlineSession(input)
-          // TODO call API to booking service to broadcast message
-          // broadcastPrivateMessage(assignedDriverId, JSON.stringify({ status: 'USER_CANCELLED', message: 'Customer cancelled your booking.' }))
           this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'USER_CANCELLED', message: 'Customer cancelled your booking.' }) })
         }
         return bookingResp
       case 'ARRIVED':
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'ARRIVED'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.ARRIVED })
-        // TODO call API to booking service to broadcast message
-        // broadcastPrivateMessage(bookingId, JSON.stringify({ status: 'ARRIVED' }))
         this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ARRIVED' }) })
         return bookingResp
       case 'PAID': {
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'PAID'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.PAID })
         if (driverId) {
-        //   await DriverLogginSession.update(
-        //     {
-        //       drivingStatus: 'WAITING_FOR_CUSTOMER'
-        //     },
-        //     {
-        //       where: { driverId }
-        //     }
-        //   )
-        // }
           const input: DriverOnlineSessionUpdateInput = {
             id: driverId,
             workingStatus: 2
           }
           await this.driverRepo.updateDriverOnlineSession(input)
-          // TODO call API to booking service to broadcast message
-          // broadcastPrivateMessage(bookingId, JSON.stringify({ status: 'PAID' }))
           this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'PAID' }) })
         }
         return bookingResp
       }
       case 'ONBOARDING':
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'ONBOARDING'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.ONBOARDING })
-        // TODO call API to booking service to broadcast message
-        // broadcastPrivateMessage(bookingId, JSON.stringify({ status: 'ONBOARDING' }))
         this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ONBOARDING' }) })
         return bookingResp
       case 'DRIVER_COME':
-        // bookingResp = await Booking.update(
-        //   {
-        //     status: 'DRIVER_COME'
-        //   },
-        //   {
-        //     where: { id: bookingId }
-        //   }
-        // )
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.DRIVER_COME })
-        // TODO call API to booking service to broadcast message
-        // broadcastPrivateMessage(bookingId, JSON.stringify({ status: 'DRIVER_COME' }))
         this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_COME' }) })
         return bookingResp
       default:
