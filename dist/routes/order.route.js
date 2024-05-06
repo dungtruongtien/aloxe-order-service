@@ -9,6 +9,7 @@ var order_controller_rest_1 = __importDefault(require("../controller/order/order
 var createOrderRoute = function () {
     var router = express_1.default.Router();
     var orderController = new order_controller_rest_1.default();
+    router.get('/', orderController.getListOrders.bind(orderController));
     router.put('/', orderController.updateOrder.bind(orderController));
     router.post('/', orderController.createOrder.bind(orderController));
     router.post('/driver-action', orderController.orderDriverAction.bind(orderController));

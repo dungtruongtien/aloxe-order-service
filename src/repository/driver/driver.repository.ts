@@ -3,6 +3,11 @@ import { INTERNAL_TOKEN } from '../../common/constant'
 import { type IGetDriversFilter, type IDriverRepo, type DriverOnlineSessionUpdateInput } from './driver.interface'
 import { type DriverOnlineSession, type Driver } from './driver.schema'
 
+export enum DriverOnlineSessionWorkingStatusEnum {
+  WAITING_FOR_CUSTOMER = 1,
+  DRIVING = 2
+}
+
 export class DriverRepository implements IDriverRepo {
   async getDrivers (filter?: IGetDriversFilter): Promise<Driver[]> {
     let queryFilter = ''

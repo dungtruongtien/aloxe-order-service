@@ -12,6 +12,7 @@ import { type IBookingService } from '../booking/booking.interface'
 import { type IProcessBookingOrderDTO } from './order.dto'
 import { type INotificationService } from '../notification/notification.interface'
 import { PRICE_PER_KM } from '../../common/constant'
+import { DriverOnlineSessionWorkingStatusEnum } from '../../repository/driver/driver.repository'
 
 export class OrderService implements IOrderService {
   private readonly orderRepo: IOrderRepo
@@ -214,7 +215,11 @@ export class OrderService implements IOrderService {
     return data
   }
 
-  orderDriverAction = async (driverId: number, orderId: number, actionType: string, assignedDriverId: number): Promise<Order | null> => {
+  orderDriverAction = async (orderId: number, actionType: string, assignedDriverId: number): Promise<Order | null> => {
+    const order = await this.orderRepo.getOrder(orderId)
+    if (!order) {
+      throw new Error('Order is not exist')
+    }
     let bookingResp = null
     switch (actionType) {
       case 'CONFIRMED':
@@ -224,8 +229,8 @@ export class OrderService implements IOrderService {
       case 'CANCELLED': {
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.CANCELLED })
         const input: DriverOnlineSessionUpdateInput = {
-          id: driverId,
-          workingStatus: 1
+          driverId: assignedDriverId,
+          workingStatus: DriverOnlineSessionWorkingStatusEnum.WAITING_FOR_CUSTOMER
         }
         await this.driverRepo.updateDriverOnlineSession(input)
         this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'CANCELLED', message: 'Driver is cancelled your booking, please retry to book a new car.' }) })
@@ -235,11 +240,11 @@ export class OrderService implements IOrderService {
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.CANCELLED })
         if (assignedDriverId) {
           const input: DriverOnlineSessionUpdateInput = {
-            id: driverId,
-            workingStatus: 1
+            driverId: assignedDriverId,
+            workingStatus: DriverOnlineSessionWorkingStatusEnum.WAITING_FOR_CUSTOMER
           }
           await this.driverRepo.updateDriverOnlineSession(input)
-          this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'USER_CANCELLED', message: 'Customer cancelled your booking.' }) })
+          await this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'USER_CANCELLED', message: 'Customer cancelled your booking.' }) })
         }
         return bookingResp
       case 'ARRIVED':
@@ -248,10 +253,10 @@ export class OrderService implements IOrderService {
         return bookingResp
       case 'PAID': {
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.PAID })
-        if (driverId) {
+        if (assignedDriverId) {
           const input: DriverOnlineSessionUpdateInput = {
-            id: driverId,
-            workingStatus: 2
+            driverId: assignedDriverId,
+            workingStatus: DriverOnlineSessionWorkingStatusEnum.DRIVING
           }
           await this.driverRepo.updateDriverOnlineSession(input)
           this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'PAID' }) })

@@ -5,7 +5,7 @@ export interface IGetDriversFilter {
 }
 
 export interface DriverOnlineSessionUpdateInput {
-  id: number
+  driverId: number
   currentLongitude?: string
   currentLatitude?: string
   onlineStatus?: number

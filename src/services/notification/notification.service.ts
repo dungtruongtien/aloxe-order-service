@@ -7,7 +7,7 @@ export default class NotificationService implements INotificationService {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'http://localhost:4005/api/notification/',
+      url: 'http://localhost:4005/api/notification/broadcast',
       headers: {
         authorization: INTERNAL_TOKEN
       },

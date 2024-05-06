@@ -1,1 +1,1 @@
-{"version":3,"file":"order.interface.js","sourceRoot":"","sources":["../../../src/services/order/order.interface.ts"],"names":[],"mappings":""}
+{"version":3,"file":"order.interface.js","sourceRoot":"","sources":["../../../src/services/order/order.interface.ts"],"names":[],"mappings":";;;AAMa,QAAA,oBAAoB,GAAiC;IAChE,SAAS,EAAE,CAAC;IACZ,SAAS,EAAE,CAAC;IACZ,UAAU,EAAE,CAAC;IACb,GAAG,EAAE,CAAC;CACP,CAAA"}

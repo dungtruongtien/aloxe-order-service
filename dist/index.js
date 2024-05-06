@@ -76,6 +76,19 @@ function start() {
                     app.use('/graphql', (0, cors_1.default)(), (0, express4_1.expressMiddleware)(server, {
                         context: context_1.default
                     }));
+                    app.use(function (err, req, res, next) {
+                        console.log('err-----', err);
+                        if (!err.status || (err.status >= 500 && err.status <= 599)) {
+                            err.status = 500;
+                            err.code = 'INTERNAL_ERROR';
+                            err.message = 'Internal error';
+                        }
+                        res.status(err.status).json({
+                            code: err.code,
+                            message: err.message,
+                            data: null
+                        });
+                    });
                     httpServer.listen({ port: 4002 }, function () {
                         console.log('🚀 Server ready at http://localhost:4002/');
                     });

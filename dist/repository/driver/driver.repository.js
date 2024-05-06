@@ -39,9 +39,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DriverRepository = void 0;
+exports.DriverRepository = exports.DriverOnlineSessionWorkingStatusEnum = void 0;
 var axios_1 = __importDefault(require("axios"));
 var constant_1 = require("../../common/constant");
+var DriverOnlineSessionWorkingStatusEnum;
+(function (DriverOnlineSessionWorkingStatusEnum) {
+    DriverOnlineSessionWorkingStatusEnum[DriverOnlineSessionWorkingStatusEnum["WAITING_FOR_CUSTOMER"] = 1] = "WAITING_FOR_CUSTOMER";
+    DriverOnlineSessionWorkingStatusEnum[DriverOnlineSessionWorkingStatusEnum["DRIVING"] = 2] = "DRIVING";
+})(DriverOnlineSessionWorkingStatusEnum || (exports.DriverOnlineSessionWorkingStatusEnum = DriverOnlineSessionWorkingStatusEnum = {}));
 var DriverRepository = (function () {
     function DriverRepository() {
     }

@@ -60,11 +60,15 @@ export default class OrderRestController implements IOrderRestController {
   }
 
   orderDriverAction = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    const { driverId, orderId, actionType, assignedDriverId } = req.body
-    const data = await this.orderService.orderDriverAction(driverId as number, orderId as number, actionType as string, assignedDriverId as number)
-    res.status(HttpStatusCode.Ok).json({
-      status: 'SUCCESS',
-      data
-    })
+    try {
+      const { orderId, actionType, assignedDriverId } = req.body
+      const data = await this.orderService.orderDriverAction(orderId as number, actionType as string, assignedDriverId as number)
+      res.status(HttpStatusCode.Ok).json({
+        status: 'SUCCESS',
+        data
+      })
+    } catch (error) {
+      next(error)
+    }
   }
 }

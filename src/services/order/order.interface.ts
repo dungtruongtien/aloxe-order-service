@@ -49,5 +49,5 @@ export interface IOrderService {
   getOrder: (id: number) => Promise<IOrderEntity | null>
   createOrder: (input: ICreateOrderInput) => Promise<any>
   updateOrder: (input: IUpdateOrderInput) => Promise<any>
-  orderDriverAction: (driverId: number, orderId: number, actionType: string, assignedDriverId: number) => Promise<Order | null>
+  orderDriverAction: (orderId: number, actionType: string, assignedDriverId: number) => Promise<Order | null>
 }

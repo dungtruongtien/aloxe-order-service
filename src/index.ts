@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import http from 'http'
 import { type GraphQLFormattedError } from 'graphql'
 import { ApolloServer } from '@apollo/server'
@@ -12,6 +12,12 @@ import { createRootRoute } from './routes/api.route'
 
 interface MyContext {
   token?: string
+}
+
+interface ICustomError {
+  message: string
+  status?: number
+  code: string
 }
 
 // eslint-disable-next-line
@@ -51,6 +57,21 @@ async function start () {
       context: initCtx
     })
   )
+
+  app.use((err: ICustomError, req: Request, res: Response, next: NextFunction) => {
+    console.log('err-----', err)
+    // eslint-disable-next-line
+    if (!err.status || (err.status >= 500 && err.status <= 599)) {
+      err.status = 500
+      err.code = 'INTERNAL_ERROR'
+      err.message = 'Internal error'
+    }
+    res.status(err.status).json({
+      code: err.code,
+      message: err.message,
+      data: null
+    })
+  })
 
   httpServer.listen({ port: 4002 }, function () {
     console.log('🚀 Server ready at http://localhost:4002/')

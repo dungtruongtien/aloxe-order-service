@@ -52,7 +52,7 @@ var NotificationService = (function () {
                         config = {
                             method: 'post',
                             maxBodyLength: Infinity,
-                            url: 'http://localhost:4005/api/notification/',
+                            url: 'http://localhost:4005/api/notification/broadcast',
                             headers: {
                                 authorization: constant_1.INTERNAL_TOKEN
                             },
