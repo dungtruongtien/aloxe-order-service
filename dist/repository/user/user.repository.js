@@ -54,7 +54,9 @@ var UserRepository = (function () {
                         queryFilter = '';
                         if ((filter === null || filter === void 0 ? void 0 : filter.phoneNumber) && filter.phoneNumber.length > 0) {
                             queryFilter = filter.phoneNumber.reduce(function (total, phone, idx) {
-                                total += "filter[phoneNumbers]=".concat(phone).concat(idx < filter.phoneNumber.length - 1 ? '&' : '');
+                                if (filter.phoneNumber) {
+                                    total += "filter[phoneNumbers]=".concat(phone).concat(idx < filter.phoneNumber.length - 1 ? '&' : '');
+                                }
                                 return total;
                             }, '');
                         }

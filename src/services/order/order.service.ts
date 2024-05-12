@@ -3,7 +3,7 @@ import { type DriverOnlineSessionUpdateInput, type IDriverRepo } from '../../rep
 import { OrderStatus, type IGetListOrderFilter, type IOrderRepo } from '../../repository/order/order.interface'
 import { type IOrderEntity } from '../../repository/order/order.schema'
 import { type IStaffRepo } from '../../repository/staff/staff.interface'
-import { type ICreateCustomerUserInput, type IGetUsersFilter, type IUserRepo } from '../../repository/user/user.interface'
+import { OrderStatusMapping, type ICreateCustomerUserInput, type IGetUsersFilter, type IUserRepo } from '../../repository/user/user.interface'
 import { type Prisma, type Order } from '@prisma/client'
 import { type IUpdateOrderInput, type ICreateOrderInput, type IOrderService, type ICreateOrderCustomerInput, VEHICLE_TYPE_MAPPING } from './order.interface'
 import { type User } from '../../repository/user/user.schema'
@@ -69,11 +69,13 @@ export class OrderService implements IOrderService {
       const staff = staffs.find(staff => staff.id === order.supportStaffId)
       const driver = drivers.find(driver => driver.id === order.driverId)
       const customer = customers.find(customer => customer.id === order.customerId)
+      const status = OrderStatusMapping[order.status]
       const orderRes: IOrderEntity = {
         ...order,
         staff,
         driver,
-        customer
+        customer,
+        status
       }
       ordersRes.push(orderRes)
     })
@@ -106,14 +108,14 @@ export class OrderService implements IOrderService {
 
   createOrder = async (input: ICreateOrderInput): Promise<any> => {
     const { customer } = input
-    if (!customer.phoneNumber) {
+    if (customer && !customer.phoneNumber) {
       throw new BadRequestError('Customer phone number is required')
     }
     let user = null
 
     // Validate exist user or not
-    if (customer.phoneNumber) {
-      const userInfo = await this.getUserInfo(input.customer)
+    if (customer?.phoneNumber || input?.customerId) {
+      const userInfo = await this.getUserInfo(input.customer, input.customerId)
       user = userInfo
     }
 
@@ -179,13 +181,23 @@ export class OrderService implements IOrderService {
     }
     await this.bookingService.processBookingOrder(processBookingOrderDTO)
 
-    return null
+    return await Promise.resolve({
+      orderId: orderCreatedRes.id
+    })
   }
 
-  getUserInfo = async (customer: ICreateOrderCustomerInput): Promise<User> => {
+  getUserInfo = async (customer: ICreateOrderCustomerInput, customerId: number): Promise<User> => {
     let user: User
-    const userFilter: IGetUsersFilter = {
-      phoneNumber: [customer.phoneNumber]
+    let userFilter: IGetUsersFilter = {}
+    if (customer?.phoneNumber) {
+      userFilter = {
+        phoneNumber: [customer.phoneNumber]
+      }
+    }
+    if (customerId !== 0) {
+      userFilter = {
+        customerIds: [customerId]
+      }
     }
     const users = await this.userRepo.getUsers(userFilter)
     if (!users || users.length === 0) {

@@ -10,6 +10,6 @@ export const createOrderRoute = (): Router => {
   router.get('/', orderController.getListOrders.bind(orderController))
   router.put('/', orderController.updateOrder.bind(orderController))
   router.post('/', orderController.createOrder.bind(orderController))
-  router.post('/driver-action', orderController.orderDriverAction.bind(orderController))
+  router.put('/order-action', orderController.orderDriverAction.bind(orderController))
   return router
 }

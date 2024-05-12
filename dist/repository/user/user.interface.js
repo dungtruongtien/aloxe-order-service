@@ -1,14 +1,35 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OrderStatusMapping = void 0;
 var OrderStatus;
 (function (OrderStatus) {
-    OrderStatus[OrderStatus["DRIVER_CONFIRMED"] = 1] = "DRIVER_CONFIRMED";
-    OrderStatus[OrderStatus["CANCELLED"] = 2] = "CANCELLED";
+    OrderStatus[OrderStatus["BOOKED"] = 1] = "BOOKED";
+    OrderStatus[OrderStatus["ONBOARDING"] = 2] = "ONBOARDING";
     OrderStatus[OrderStatus["ARRIVED"] = 3] = "ARRIVED";
-    OrderStatus[OrderStatus["PAID"] = 4] = "PAID";
-    OrderStatus[OrderStatus["ONBOARDING"] = 5] = "ONBOARDING";
-    OrderStatus[OrderStatus["BOOKED"] = 6] = "BOOKED";
+    OrderStatus[OrderStatus["CANCELLED"] = 4] = "CANCELLED";
+    OrderStatus[OrderStatus["PAID"] = 5] = "PAID";
+    OrderStatus[OrderStatus["DRIVER_FOUND"] = 6] = "DRIVER_FOUND";
+    OrderStatus[OrderStatus["DRIVER_CONFIRMED"] = 7] = "DRIVER_CONFIRMED";
+    OrderStatus[OrderStatus["DRIVER_COME"] = 8] = "DRIVER_COME";
+    OrderStatus[OrderStatus["DRIVER_NOT_FOUND"] = 9] = "DRIVER_NOT_FOUND";
+    OrderStatus[OrderStatus["WAITING_FOR_DRIVER"] = 10] = "WAITING_FOR_DRIVER";
+    OrderStatus[OrderStatus["USER_CANCELLED"] = 11] = "USER_CANCELLED";
+    OrderStatus[OrderStatus["CONFIRMED"] = 12] = "CONFIRMED";
 })(OrderStatus || (OrderStatus = {}));
+exports.OrderStatusMapping = {
+    1: 'BOOKED',
+    2: 'ONBOARDING',
+    3: 'ARRIVED',
+    4: 'CANCELLED',
+    5: 'PAID',
+    6: 'DRIVER_FOUND',
+    7: 'DRIVER_CONFIRMED',
+    8: 'DRIVER_COME',
+    9: 'DRIVER_NOT_FOUND',
+    10: 'WAITING_FOR_DRIVER',
+    11: 'USER_CANCELLED',
+    12: 'CONFIRMED'
+};
 var Sort;
 (function (Sort) {
     Sort["ASC"] = "ASC";

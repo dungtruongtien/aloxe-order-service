@@ -49,10 +49,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderService = void 0;
 var order_interface_1 = require("../../repository/order/order.interface");
+var user_interface_1 = require("../../repository/user/user.interface");
 var order_interface_2 = require("./order.interface");
 var distance_1 = require("../../utils/distance");
 var constant_1 = require("../../common/constant");
 var driver_repository_1 = require("../../repository/driver/driver.repository");
+var custom_error_1 = require("../../common/custom_error");
 var OrderService = (function () {
     function OrderService(orderRepo, userRepo, staffRepo, driverRepo, customerRepo, bookingService, notificationService) {
         var _this = this;
@@ -101,7 +103,8 @@ var OrderService = (function () {
                             var staff = staffs.find(function (staff) { return staff.id === order.supportStaffId; });
                             var driver = drivers.find(function (driver) { return driver.id === order.driverId; });
                             var customer = customers.find(function (customer) { return customer.id === order.customerId; });
-                            var orderRes = __assign(__assign({}, order), { staff: staff, driver: driver, customer: customer });
+                            var status = user_interface_1.OrderStatusMapping[order.status];
+                            var orderRes = __assign(__assign({}, order), { staff: staff, driver: driver, customer: customer, status: status });
                             ordersRes.push(orderRes);
                         });
                         return [2, ordersRes];
@@ -147,9 +150,12 @@ var OrderService = (function () {
                 switch (_g.label) {
                     case 0:
                         customer = input.customer;
+                        if (customer && !customer.phoneNumber) {
+                            throw new custom_error_1.BadRequestError('Customer phone number is required');
+                        }
                         user = null;
-                        if (!customer.phoneNumber) return [3, 2];
-                        return [4, this.getUserInfo(input.customer)];
+                        if (!((customer === null || customer === void 0 ? void 0 : customer.phoneNumber) || (input === null || input === void 0 ? void 0 : input.customerId))) return [3, 2];
+                        return [4, this.getUserInfo(input.customer, input.customerId)];
                     case 1:
                         userInfo = _g.sent();
                         user = userInfo;
@@ -217,18 +223,29 @@ var OrderService = (function () {
                         return [4, this.bookingService.processBookingOrder(processBookingOrderDTO)];
                     case 4:
                         _g.sent();
-                        return [2, null];
+                        return [4, Promise.resolve({
+                                orderId: orderCreatedRes.id
+                            })];
+                    case 5: return [2, _g.sent()];
                 }
             });
         }); };
-        this.getUserInfo = function (customer) { return __awaiter(_this, void 0, void 0, function () {
+        this.getUserInfo = function (customer, customerId) { return __awaiter(_this, void 0, void 0, function () {
             var user, userFilter, users, input, userCreatedResp;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        userFilter = {
-                            phoneNumber: [customer.phoneNumber]
-                        };
+                        userFilter = {};
+                        if (customer === null || customer === void 0 ? void 0 : customer.phoneNumber) {
+                            userFilter = {
+                                phoneNumber: [customer.phoneNumber]
+                            };
+                        }
+                        if (customerId !== 0) {
+                            userFilter = {
+                                customerIds: [customerId]
+                            };
+                        }
                         return [4, this.userRepo.getUsers(userFilter)];
                     case 1:
                         users = _a.sent();

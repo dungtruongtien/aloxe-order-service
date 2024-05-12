@@ -8,7 +8,9 @@ export class UserRepository implements IUserRepo {
     let queryFilter = ''
     if (filter?.phoneNumber && filter.phoneNumber.length > 0) {
       queryFilter = filter.phoneNumber.reduce((total, phone, idx) => {
-        total += `filter[phoneNumbers]=${phone}${idx < filter.phoneNumber.length - 1 ? '&' : ''}`
+        if (filter.phoneNumber) {
+          total += `filter[phoneNumbers]=${phone}${idx < filter.phoneNumber.length - 1 ? '&' : ''}`
+        }
         return total
       }, '')
     }

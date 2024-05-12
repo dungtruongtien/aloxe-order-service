@@ -35,6 +35,7 @@ export interface ICreateOrderInput {
     pickupLocation: string
     returnLocation: string
   }
+  customerId: number
 }
 
 export interface IUpdateOrderInput {
