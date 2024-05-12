@@ -13,6 +13,7 @@ import { type IProcessBookingOrderDTO } from './order.dto'
 import { type INotificationService } from '../notification/notification.interface'
 import { PRICE_PER_KM } from '../../common/constant'
 import { DriverOnlineSessionWorkingStatusEnum } from '../../repository/driver/driver.repository'
+import { BadRequestError } from '../../common/custom_error'
 
 export class OrderService implements IOrderService {
   private readonly orderRepo: IOrderRepo
@@ -105,6 +106,9 @@ export class OrderService implements IOrderService {
 
   createOrder = async (input: ICreateOrderInput): Promise<any> => {
     const { customer } = input
+    if (!customer.phoneNumber) {
+      throw new BadRequestError('Customer phone number is required')
+    }
     let user = null
 
     // Validate exist user or not
