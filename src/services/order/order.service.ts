@@ -1,9 +1,13 @@
 import { type ICustomerRepo } from '../../repository/customer/customer.interface'
 import { type DriverOnlineSessionUpdateInput, type IDriverRepo } from '../../repository/driver/driver.interface'
-import { OrderStatus, type IGetListOrderFilter, type IOrderRepo } from '../../repository/order/order.interface'
+import { OrderStatus, OrderStatusMapping, type IGetListOrderFilter, type IOrderRepo } from '../../repository/order/order.interface'
 import { type IOrderEntity } from '../../repository/order/order.schema'
 import { type IStaffRepo } from '../../repository/staff/staff.interface'
-import { OrderStatusMapping, type ICreateCustomerUserInput, type IGetUsersFilter, type IUserRepo } from '../../repository/user/user.interface'
+import {
+  type ICreateCustomerUserInput,
+  type IGetUsersFilter,
+  type IUserRepo
+} from '../../repository/user/user.interface'
 import { type Prisma, type Order } from '@prisma/client'
 import { type IUpdateOrderInput, type ICreateOrderInput, type IOrderService, type ICreateOrderCustomerInput, VEHICLE_TYPE_MAPPING } from './order.interface'
 import { type User } from '../../repository/user/user.schema'
@@ -50,7 +54,7 @@ export class OrderService implements IOrderService {
       customerId = listUsers.map(user => user.customer ? user.customer.id : 0)
       filter.customerIds = customerId
     }
-    const orders = await this.orderRepo.getListOrder(filter, limit, offset, {})
+    const orders = await this.orderRepo.getListOrder(filter, limit, offset, { createdAt: 'desc' })
     if (!orders) {
       return rs
     }
@@ -139,7 +143,7 @@ export class OrderService implements IOrderService {
       customerId: user?.customer?.id ?? 0,
       supportStaffId: input?.staff?.id || 0,
       code: `BOOK_${new Date().getTime()}`,
-      status: 1,
+      status: OrderStatus.WAITING_FOR_DRIVER,
       startTime: new Date(input.startTime),
       endTime: input.endTime,
       totalPrice,
@@ -181,9 +185,7 @@ export class OrderService implements IOrderService {
     }
     await this.bookingService.processBookingOrder(processBookingOrderDTO)
 
-    return await Promise.resolve({
-      orderId: orderCreatedRes.id
-    })
+    return await Promise.resolve({ ...orderCreatedRes, status: OrderStatusMapping[orderCreatedRes.status] })
   }
 
   getUserInfo = async (customer: ICreateOrderCustomerInput, customerId: number): Promise<User> => {
@@ -240,7 +242,7 @@ export class OrderService implements IOrderService {
     switch (actionType) {
       case 'CONFIRMED':
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.DRIVER_CONFIRMED })
-        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_CONFIRMED' }) })
+        await this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_CONFIRMED' }) })
         return bookingResp
       case 'CANCELLED': {
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.CANCELLED })
@@ -265,14 +267,14 @@ export class OrderService implements IOrderService {
         return bookingResp
       case 'ARRIVED':
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.ARRIVED })
-        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ARRIVED' }) })
+        await this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ARRIVED' }) })
         return bookingResp
       case 'PAID': {
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.PAID })
         if (assignedDriverId) {
           const input: DriverOnlineSessionUpdateInput = {
             driverId: assignedDriverId,
-            workingStatus: DriverOnlineSessionWorkingStatusEnum.DRIVING
+            workingStatus: DriverOnlineSessionWorkingStatusEnum.WAITING_FOR_CUSTOMER
           }
           await this.driverRepo.updateDriverOnlineSession(input)
           this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'PAID' }) })
@@ -281,11 +283,11 @@ export class OrderService implements IOrderService {
       }
       case 'ONBOARDING':
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.ONBOARDING })
-        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ONBOARDING' }) })
+        await this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'ONBOARDING' }) })
         return bookingResp
       case 'DRIVER_COME':
         bookingResp = await this.orderRepo.updateOrder(orderId, { status: OrderStatus.DRIVER_COME })
-        this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_COME' }) })
+        await this.notificationService.broadcast({ msgId: orderId.toString(), content: JSON.stringify({ status: 'DRIVER_COME' }) })
         return bookingResp
       default:
         break

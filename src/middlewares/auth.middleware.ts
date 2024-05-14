@@ -16,7 +16,7 @@ export const graphqlAuthenticate = (req: Request, res: Response, next: NextFunct
     return
   }
 
-  const token: string = req.headers.authorization ?? ''
+  const token: string = req.headers['x-access-token'] as string ?? ''
   console.log('req----', req)
   if (!token) {
     throw new Error('Authentication failed')
@@ -42,7 +42,7 @@ export const restAuthenticate = (req: Request, res: Response, next: NextFunction
     return
   }
 
-  const token: string = req.headers.authorization ?? ''
+  const token: string = req.headers['x-access-token'] as string ?? ''
   if (!token) {
     throw new Error('Authentication failed')
   }
@@ -56,7 +56,7 @@ export const restAuthenticate = (req: Request, res: Response, next: NextFunction
       throw new Error('TokenExpiredError')
     }
 
-    res.locals.user = { ...decoded }
+    res.locals.session = { ...decoded }
     next()
   })
 }

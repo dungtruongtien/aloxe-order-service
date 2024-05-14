@@ -36,7 +36,7 @@ export default class OrderRestController implements IOrderRestController {
 
   async getOrder (req: Request, res: Response, next: NextFunction): Promise<any> {
     const id = req.params.id
-    const data = await this.orderService.getOrder(id as unknown as number)
+    const data = await this.orderService.getOrder(parseInt(id) as unknown as number)
     res.status(HttpStatusCode.Ok).json({
       status: 'SUCCESS',
       data
@@ -61,8 +61,9 @@ export default class OrderRestController implements IOrderRestController {
 
   orderDriverAction = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-      const { orderId, actionType, assignedDriverId } = req.body
-      const data = await this.orderService.orderDriverAction(orderId as number, actionType as string, assignedDriverId as number)
+      const driverId = res.locals.session.driver.id
+      const { orderId, actionType } = req.body
+      const data = await this.orderService.orderDriverAction(orderId as number, actionType as string, driverId as number)
       res.status(HttpStatusCode.Ok).json({
         status: 'SUCCESS',
         data

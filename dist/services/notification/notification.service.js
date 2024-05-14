@@ -45,7 +45,7 @@ var NotificationService = (function () {
     function NotificationService() {
         var _this = this;
         this.broadcast = function (input) { return __awaiter(_this, void 0, void 0, function () {
-            var config;
+            var config, resp;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -60,7 +60,8 @@ var NotificationService = (function () {
                         };
                         return [4, axios_1.default.request(config)];
                     case 1:
-                        _a.sent();
+                        resp = _a.sent();
+                        console.log('resp-------', resp);
                         return [2, true];
                 }
             });

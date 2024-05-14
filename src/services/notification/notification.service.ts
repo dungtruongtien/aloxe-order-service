@@ -13,7 +13,8 @@ export default class NotificationService implements INotificationService {
       },
       data: input
     }
-    await axios.request(config)
+    const resp = await axios.request(config)
+    console.log('resp-------', resp)
     return true
   }
 }

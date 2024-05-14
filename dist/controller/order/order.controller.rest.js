@@ -59,13 +59,14 @@ var OrderRestController = (function () {
         this.bookingService = new booking_service_1.BookingService();
         this.notificationService = new notification_service_1.default();
         this.orderDriverAction = function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, orderId, actionType, assignedDriverId, data, error_1;
+            var driverId, _a, orderId, actionType, data, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 2, , 3]);
-                        _a = req.body, orderId = _a.orderId, actionType = _a.actionType, assignedDriverId = _a.assignedDriverId;
-                        return [4, this.orderService.orderDriverAction(orderId, actionType, assignedDriverId)];
+                        driverId = res.locals.session.driver.id;
+                        _a = req.body, orderId = _a.orderId, actionType = _a.actionType;
+                        return [4, this.orderService.orderDriverAction(orderId, actionType, driverId)];
                     case 1:
                         data = _b.sent();
                         res.status(axios_1.HttpStatusCode.Ok).json({
@@ -109,7 +110,7 @@ var OrderRestController = (function () {
                 switch (_a.label) {
                     case 0:
                         id = req.params.id;
-                        return [4, this.orderService.getOrder(id)];
+                        return [4, this.orderService.getOrder(parseInt(id))];
                     case 1:
                         data = _a.sent();
                         res.status(axios_1.HttpStatusCode.Ok).json({
