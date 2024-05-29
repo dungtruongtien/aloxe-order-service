@@ -196,7 +196,7 @@ export class OrderService implements IOrderService {
         phoneNumber: [customer.phoneNumber]
       }
     }
-    if (customerId !== 0) {
+    if (customerId) {
       userFilter = {
         customerIds: [customerId]
       }

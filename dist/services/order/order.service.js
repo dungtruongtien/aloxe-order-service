@@ -238,7 +238,7 @@ var OrderService = (function () {
                                 phoneNumber: [customer.phoneNumber]
                             };
                         }
-                        if (customerId !== 0) {
+                        if (customerId) {
                             userFilter = {
                                 customerIds: [customerId]
                             };
