@@ -53,10 +53,7 @@ var CustomerRepository = (function () {
                     case 0:
                         queryFilter = '';
                         if ((filter === null || filter === void 0 ? void 0 : filter.customerIds) && filter.customerIds.length > 0) {
-                            queryFilter = filter.customerIds.reduce(function (total, customerId, idx) {
-                                total += "id=".concat(customerId).concat(idx < filter.customerIds.length - 1 && '&');
-                                return total;
-                            }, '');
+                            queryFilter = "ids=".concat(filter.customerIds.join(','));
                         }
                         config = {
                             method: 'get',

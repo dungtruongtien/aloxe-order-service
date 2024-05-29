@@ -7,10 +7,7 @@ export class CustomerRepository implements ICustomerRepo {
   async getCustomers (filter?: IGetCustomersFilter): Promise<Customer[]> {
     let queryFilter = ''
     if (filter?.customerIds && filter.customerIds.length > 0) {
-      queryFilter = filter.customerIds.reduce((total, customerId, idx) => {
-        total += `id=${customerId}${idx < filter.customerIds.length - 1 && '&'}`
-        return total
-      }, '')
+      queryFilter = `ids=${filter.customerIds.join(',')}`
     }
     const config = {
       method: 'get',
