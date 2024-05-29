@@ -119,7 +119,7 @@ var OrderService = (function () {
                     case 1:
                         order = _d.sent();
                         if (!order) {
-                            return [2, null];
+                            throw new custom_error_1.BadRequestError('Order is not exist');
                         }
                         orderRes = __assign({}, order);
                         if (!order.supportStaffId) return [3, 3];

@@ -105,10 +105,11 @@ var OrderRestController = (function () {
     };
     OrderRestController.prototype.getOrder = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, data;
+            var id, data, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        _a.trys.push([0, 2, , 3]);
                         id = req.params.id;
                         return [4, this.orderService.getOrder(parseInt(id))];
                     case 1:
@@ -117,7 +118,12 @@ var OrderRestController = (function () {
                             status: 'SUCCESS',
                             data: data
                         });
-                        return [2];
+                        return [3, 3];
+                    case 2:
+                        error_2 = _a.sent();
+                        next(error_2);
+                        return [3, 3];
+                    case 3: return [2];
                 }
             });
         });

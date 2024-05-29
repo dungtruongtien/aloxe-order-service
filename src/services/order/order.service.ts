@@ -89,7 +89,7 @@ export class OrderService implements IOrderService {
   getOrder = async (id: number): Promise<IOrderEntity | null> => {
     const order = await this.orderRepo.getOrder(id)
     if (!order) {
-      return null
+      throw new BadRequestError('Order is not exist')
     }
     // Get staff, customer, driver info to fill in order data
     const orderRes: IOrderEntity = {

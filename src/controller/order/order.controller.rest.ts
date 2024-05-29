@@ -35,12 +35,16 @@ export default class OrderRestController implements IOrderRestController {
   }
 
   async getOrder (req: Request, res: Response, next: NextFunction): Promise<any> {
-    const id = req.params.id
-    const data = await this.orderService.getOrder(parseInt(id) as unknown as number)
-    res.status(HttpStatusCode.Ok).json({
-      status: 'SUCCESS',
-      data
-    })
+    try {
+      const id = req.params.id
+      const data = await this.orderService.getOrder(parseInt(id) as unknown as number)
+      res.status(HttpStatusCode.Ok).json({
+        status: 'SUCCESS',
+        data
+      })
+    } catch (error) {
+      next(error)
+    }
   }
 
   async updateOrder (req: Request, res: Response, next: NextFunction): Promise<any> {

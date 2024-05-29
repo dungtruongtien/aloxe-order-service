@@ -42,7 +42,12 @@ export class OrderRepository implements IOrderRepo {
   }
 
   async getOrder (id: number): Promise<Order | null> {
-    return await prisma.order.findUnique({ where: { id } })
+    return await prisma.order.findUnique({
+      where: { id },
+      include: {
+        orderDetail: true
+      }
+    })
   }
 
   async createOrder (input: Prisma.OrderCreateInput): Promise<Order> {
