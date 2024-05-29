@@ -78,6 +78,9 @@ var OrderRepository = (function () {
                         }
                         return [4, prisma_1.default.order.findMany({
                                 where: where,
+                                include: {
+                                    orderDetail: true
+                                },
                                 take: limit,
                                 skip: page,
                                 orderBy: sort

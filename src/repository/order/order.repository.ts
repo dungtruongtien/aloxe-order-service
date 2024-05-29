@@ -32,6 +32,9 @@ export class OrderRepository implements IOrderRepo {
     }
     return await prisma.order.findMany({
       where,
+      include: {
+        orderDetail: true
+      },
       take: limit,
       skip: page,
       orderBy: sort
