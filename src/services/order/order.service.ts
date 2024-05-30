@@ -107,6 +107,7 @@ export class OrderService implements IOrderService {
       const drivers = await this.driverRepo.getDrivers({ driverIds: [order.driverId] })
       orderRes.driver = drivers[0] ?? {}
     }
+    orderRes.status = OrderStatusMapping[order.status]
     return orderRes
   }
 
