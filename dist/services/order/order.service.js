@@ -138,7 +138,9 @@ var OrderService = (function () {
                         drivers = _d.sent();
                         orderRes.driver = (_c = drivers[0]) !== null && _c !== void 0 ? _c : {};
                         _d.label = 6;
-                    case 6: return [2, orderRes];
+                    case 6:
+                        orderRes.status = order_interface_1.OrderStatusMapping[order.status];
+                        return [2, orderRes];
                 }
             });
         }); };
